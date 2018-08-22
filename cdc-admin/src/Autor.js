@@ -23,7 +23,7 @@ export class FormAutor extends Component {
           type: 'post',
           data: JSON.stringify({nome: this.state.nome, email: this.state.email, senha: this.state.senha}),
           success: function(response) {
-            console.log("Sucesso");
+            this.props.callbackAtualizaListagem(response);
           }.bind(this),
           error: function(res) {
             console.error("Erro");
@@ -62,27 +62,6 @@ export class FormAutor extends Component {
 
 export class ListaAutores extends Component {
 
-    constructor() {
-        super();
-        this.state = {lista: []};
-        this.atuaizarLista = this.atuaizarLista.bind(this);
-    }
-
-    componentDidMount() {
-        $.ajax({
-          url: 'https://cdc-react.herokuapp.com/api/autores',
-          dataType: 'json',
-          success: function(response) {
-            this.atuaizarLista(response);
-          }.bind(this)
-        });
-    }
-    
-    atuaizarLista(autores) {
-        let latter = autores.reverse().slice(0,10);
-        this.setState({lista: latter});
-    }
-
     render() {
         return (
             <div>            
@@ -95,7 +74,7 @@ export class ListaAutores extends Component {
                 </thead>
                 <tbody>
                   {
-                    this.state.lista.map(function(autor) {
+                    this.props.lista.map(function(autor) {
                       return (
                         <tr key={autor.id}>
                           <td>{autor.nome}</td>
@@ -106,6 +85,40 @@ export class ListaAutores extends Component {
                   }
                 </tbody>
               </table> 
+            </div>
+        );
+    }
+}
+
+export default class AutorBox extends Component {
+
+    constructor() {
+        super();
+        this.state = {lista: []};
+        this.atualizaListagem = this.atualizaListagem.bind(this);
+    }
+
+    componentDidMount() {
+        $.ajax({
+          url: 'https://cdc-react.herokuapp.com/api/autores',
+          dataType: 'json',
+          success: function(autores) {
+            let late = autores.reverse().slice(0,10);
+            this.setState({lista: late});
+          }.bind(this)
+        });
+    }
+
+    atualizaListagem(novaLista) {
+        let late = novaLista.reverse().slice(0,10);
+        this.setState({lista: late});
+    }
+
+    render(){
+        return(
+            <div>
+                <FormAutor callbackAtualizaListagem={this.atualizaListagem}/> 
+                <ListaAutores lista={this.state.lista} />
             </div>
         );
     }
