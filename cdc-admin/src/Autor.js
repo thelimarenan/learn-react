@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
+import PubSub from 'pubsub-js';
 import InputCustomizado from './components/InputCustomizado';
+import TradadorErros from './TradadorErros';
 
 export class FormAutor extends Component {
 
@@ -22,11 +24,17 @@ export class FormAutor extends Component {
           dataType: 'json',
           type: 'post',
           data: JSON.stringify({nome: this.state.nome, email: this.state.email, senha: this.state.senha}),
-          success: function(response) {
-            this.props.callbackAtualizaListagem(response);
+          success: function(novaLista) {
+            PubSub.publish('atualiza-lista-autores', novaLista);
+            this.setState({nome:'', email: '', senha: ''});
           }.bind(this),
           error: function(res) {
-            console.error("Erro");
+            if(res.status === 400) {
+              new TradadorErros().publicaErros(res.responseJSON);
+            }
+          },
+          beforeSend: function() {
+            PubSub.publish('limpa-erro', {});
           }
         });
       }
@@ -107,6 +115,11 @@ export default class AutorBox extends Component {
             this.setState({lista: late});
           }.bind(this)
         });
+
+        PubSub.subscribe('atualiza-lista-autores', function(topic, novaLista) {
+          let late = novaLista.reverse().slice(0,10);
+          this.setState({lista: late});
+        }.bind(this));
     }
 
     atualizaListagem(novaLista) {
@@ -117,7 +130,7 @@ export default class AutorBox extends Component {
     render(){
         return(
             <div>
-                <FormAutor callbackAtualizaListagem={this.atualizaListagem}/> 
+                <FormAutor /> 
                 <ListaAutores lista={this.state.lista} />
             </div>
         );

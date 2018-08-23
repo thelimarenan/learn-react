@@ -1,6 +1,24 @@
 import React, { Component } from 'react';
+import PubSub from 'pubsub-js';
 
 export default class InputCustomizado extends Component {
+
+    constructor() {
+        super();
+        this.state = {msgErro: ''};
+    }
+    
+    componentDidMount() {
+        PubSub.subscribe('erro-validacao', function(topic, erro) {
+            if(erro.field == this.props.name) {
+                this.setState({msgErro: erro.defaultMessage});
+            }
+        }.bind(this));
+
+        PubSub.subscribe('limpa-erro', function(topic){
+            this.setState({msgErro:''});
+        }.bind(this));
+    }
 
     render() {
         return (
@@ -11,6 +29,7 @@ export default class InputCustomizado extends Component {
                     name={this.props.name}
                     value={this.props.value}
                     onChange={this.props.onChange} />
+                <span>{this.state.msgErro}</span>
             </div>
         );
     }
