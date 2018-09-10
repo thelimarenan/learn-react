@@ -8,7 +8,7 @@ class App extends Component {
   render() {
     return (
       <div id="layout">
-        <a href="#menu" id="menuLink" className="menu-link">
+        <a href="" id="menuLink" className="menu-link">
           <span></span>
         </a>
 

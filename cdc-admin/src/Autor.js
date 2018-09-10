@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import $ from 'jquery';
 import PubSub from 'pubsub-js';
 import InputCustomizado from './components/InputCustomizado';
-import TradadorErros from './TradadorErros';
+import TratadorErros from './TratadorErros';
 
 export class FormAutor extends Component {
 
@@ -16,55 +16,56 @@ export class FormAutor extends Component {
     }
 
     enviarForm(event) {
-        event.preventDefault();
-        
-        $.ajax({
-          url: 'https://cdc-react.herokuapp.com/api/autores',
-          contentType: 'application/json',
-          dataType: 'json',
-          type: 'post',
-          data: JSON.stringify({nome: this.state.nome, email: this.state.email, senha: this.state.senha}),
-          success: function(novaLista) {
-            PubSub.publish('atualiza-lista-autores', novaLista);
-            this.setState({nome:'', email: '', senha: ''});
-          }.bind(this),
-          error: function(res) {
-            if(res.status === 400) {
-              new TradadorErros().publicaErros(res.responseJSON);
-            }
-          },
-          beforeSend: function() {
-            PubSub.publish('limpa-erro', {});
+      console.log(event);
+      event.preventDefault();
+      
+      $.ajax({
+        url: 'https://cdc-react.herokuapp.com/api/autores',
+        contentType: 'application/json',
+        dataType: 'json',
+        type: 'post',
+        data: JSON.stringify({nome: this.state.nome, email: this.state.email, senha: this.state.senha}),
+        success: function(novaLista) {
+          PubSub.publish('atualiza-lista-autores', novaLista);
+          this.setState({nome:'', email: '', senha: ''});
+        }.bind(this),
+        error: function(res) {
+          if(res.status === 400) {
+            new TratadorErros().publicaErros(res.responseJSON);
           }
-        });
-      }
+        },
+        beforeSend: function() {
+          PubSub.publish('limpa-erro', {});
+        }
+      });
+    }
     
-      setNome(event) {
-        this.setState({nome: event.target.value});
-      }
-    
-      setEmail(event) {
-        this.setState({email: event.target.value});
-      }
-    
-      setSenha(event) {
-        this.setState({senha: event.target.value});
-      }
+    setNome(event) {
+      this.setState({nome: event.target.value});
+    }
+  
+    setEmail(event) {
+      this.setState({email: event.target.value});
+    }
+  
+    setSenha(event) {
+      this.setState({senha: event.target.value});
+    }
 
     render() {
-        return (
-            <div className="pure-form pure-form-aligned">
-              <form className="pure-form pure-form-aligned" onSubmit={this.enviarForm} method="post">
-                <InputCustomizado id="nome" label="Nome" type="text" name="nome" value={this.state.nome} onChange={this.setNome}/>
-                <InputCustomizado id="email" label="Email" type="email" name="email" value={this.state.email} onChange={this.setEmail}/>
-                <InputCustomizado id="senha" label="Senha" type="password" name="senha" value={this.state.senha} onChange={this.setSenha}/>
-                <div className="pure-control-group">                                  
-                  <label></label> 
-                  <button type="submit" className="pure-button pure-button-primary">Gravar</button>                                    
-                </div>
-              </form>
-            </div> 
-        );
+      return (
+          <div className="pure-form pure-form-aligned">
+            <form className="pure-form pure-form-aligned" onSubmit={this.enviarForm} method="post">
+              <InputCustomizado id="nome" label="Nome" type="text" name="nome" value={this.state.nome} onChange={this.setNome}/>
+              <InputCustomizado id="email" label="Email" type="email" name="email" value={this.state.email} onChange={this.setEmail}/>
+              <InputCustomizado id="senha" label="Senha" type="password" name="senha" value={this.state.senha} onChange={this.setSenha}/>
+              <div className="pure-control-group">                                  
+                <label></label> 
+                <button type="submit" className="pure-button pure-button-primary">Gravar</button>                                    
+              </div>
+            </form>
+          </div> 
+      );
     }
 }
 
