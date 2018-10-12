@@ -7,13 +7,14 @@ import './index.css';
 import App from './App';
 import Home from './Home';
 import AutorBox from './Autor';
+import LivroBox from './Livro';
 
 ReactDOM.render(
     <Router history={browserHistory}>
         <Route path="/" component={App}>
             <IndexRoute component={Home} />
             <Route path="/autor" component={AutorBox} />
-            <Route path="/livro" />
+            <Route path="/livro" component={LivroBox} />
         </Route>
     </Router>
     , document.getElementById('root'));

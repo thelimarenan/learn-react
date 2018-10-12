@@ -59,7 +59,7 @@ export class FormAutor extends Component {
               <InputCustomizado id="nome" label="Nome" type="text" name="nome" value={this.state.nome} onChange={this.setNome}/>
               <InputCustomizado id="email" label="Email" type="email" name="email" value={this.state.email} onChange={this.setEmail}/>
               <InputCustomizado id="senha" label="Senha" type="password" name="senha" value={this.state.senha} onChange={this.setSenha}/>
-              <div className="pure-control-group">                                  
+              <div className="pure-control-group">
                 <label></label> 
                 <button type="submit" className="pure-button pure-button-primary">Gravar</button>                                    
               </div>
@@ -104,7 +104,6 @@ export default class AutorBox extends Component {
     constructor() {
         super();
         this.state = {lista: []};
-        this.atualizaListagem = this.atualizaListagem.bind(this);
     }
 
     componentDidMount() {
@@ -121,11 +120,6 @@ export default class AutorBox extends Component {
           let late = novaLista.reverse().slice(0,10);
           this.setState({lista: late});
         }.bind(this));
-    }
-
-    atualizaListagem(novaLista) {
-        let late = novaLista.reverse().slice(0,10);
-        this.setState({lista: late});
     }
 
     render(){
