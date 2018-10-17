@@ -9,7 +9,7 @@ export default class LivroBox extends Component {
 
     constructor() {
         super();
-        this.state = {lista: []};
+        this.state = {lista: [], autores:[]};
     }
 
     componentDidMount() {
@@ -17,8 +17,15 @@ export default class LivroBox extends Component {
           url: 'https://cdc-react.herokuapp.com/api/livros',
           dataType: 'json',
           success: function(livros) {
-            let late = livros.reverse().slice(0,10);
-            this.setState({lista: late});
+            this.setState({lista: livros.reverse().slice(0,10)});
+          }.bind(this)
+        });
+
+        $.ajax({
+          url:"https://cdc-react.herokuapp.com/api/autores",
+          dataType: 'json',
+          success:function(autores){
+            this.setState({autores: autores.reverse().slice(0,5)});
           }.bind(this)
         });
 
@@ -35,7 +42,7 @@ export default class LivroBox extends Component {
                     <h1>Cadastro de livros</h1>
                 </div>
                 <div className="content" id="content">
-                    <FormLivro />
+                    <FormLivro autores={this.state.autores}/>
                     <ListaLivros lista={this.state.lista}/>
                 </div>
             </div>
@@ -83,21 +90,21 @@ export class FormLivro extends Component {
         this.enviarForm = this.enviarForm.bind(this);
         this.setTitulo = this.setTitulo.bind(this);
         this.setPreco = this.setPreco.bind(this);
-        this.setAutor = this.setAutor.bind(this);
+        this.setAutorId = this.setAutorId.bind(this);
     }
 
     enviarForm(event) {
       event.preventDefault();
       
       $.ajax({
-        url: 'https://cdc-react.herokuapp.com/api/Livros',
+        url: 'https://cdc-react.herokuapp.com/api/livros',
         contentType: 'application/json',
         dataType: 'json',
         type: 'post',
-        data: JSON.stringify({titulo: this.state.titulo, preco: this.state.preco, autorId: this.state.autor}),
+        data: JSON.stringify({titulo: this.state.titulo, preco: this.state.preco, autorId: this.state.autorId}),
         success: function(novaLista) {
           PubSub.publish('atualiza-lista-livros', novaLista);
-          this.setState({titulo:'', preco: '', autor: ''});
+          this.setState({titulo:'', preco: '', autorId: ''});
         }.bind(this),
         error: function(res) {
           if(res.status === 400) {
@@ -118,8 +125,8 @@ export class FormLivro extends Component {
       this.setState({preco: event.target.value});
     }
   
-    setAutor(event) {
-      this.setState({autor: event.target.value});
+    setAutorId(event) {
+      this.setState({autorId: event.target.value});
     }
 
     render() {
@@ -128,7 +135,17 @@ export class FormLivro extends Component {
             <form className="pure-form pure-form-aligned" onSubmit={this.enviarForm} method="post">
               <InputCustomizado id="titulo" label="Título" type="text" name="titulo" value={this.state.titulo} onChange={this.setTitulo}/>
               <InputCustomizado id="preco" label="Preco" type="text" name="preco" value={this.state.preco} onChange={this.setPreco}/>
-              <InputCustomizado id="autor" label="Autor - Id" type="text" name="autor" value={this.state.autor} onChange={this.setAutor}/>
+              <div className="pure-control-group">
+                <label htmlFor="autor">Autor</label> 
+                <select id="autor" name="autor" value={this.state.autorId} onChange={this.setAutorId}>
+                  <option value="">Selecione um autor</option>
+                  {
+                    this.props.autores.map(autor => (
+                      <option value={autor.id}>{autor.nome}</option>
+                    ))
+                  }
+                </select>
+              </div>
               <div className="pure-control-group">
                 <label></label> 
                 <button type="submit" className="pure-button pure-button-primary">Gravar</button>                                    
