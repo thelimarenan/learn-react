@@ -1,4 +1,4 @@
-# Learn-React - part II
+# Learn-React
 
 
 ### API
